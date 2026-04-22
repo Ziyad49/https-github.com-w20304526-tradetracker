@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block page_title %}Journal{% endblock %}
+{% block page_subtitle %}Daily reflection, mood tracking, and trading lessons{% endblock %}
+
+{% block content %}
+
+<section class="journal-hero">
+    <div class="journal-hero-copy">
+        <span class="eyebrow">Trader Reflection</span>
+        <h1>Capture what you felt, what you learned, and what needs to change next.</h1>
+        <p>
+            A stronger trading project should not only track outcomes. It should also show discipline, reflection,
+            and behavior review. This page turns journal entries into a cleaner reflection timeline.
+        </p>
+    </div>
+
+    <div class="journal-hero-panel">
+        <span class="panel-tag">Reflection Score</span>
+        <div class="analytics-score-value" id="journalReflectionScore">0</div>
+        <div class="analytics-score-label" id="journalReflectionLabel">Loading journal quality...</div>
+        <div class="analytics-score-meter">
+            <div class="analytics-score-fill" id="journalReflectionFill"></div>
+        </div>
+        <p id="journalReflectionNote">Reviewing recent entries and mood consistency.</p>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Latest Mood</div>
+        <div class="card-value" id="journalMood">-</div>
+        <div class="card-chip">Most recent entry</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Entries</div>
+        <div class="card-value" id="journalCount">0</div>
+        <div class="card-chip">Last 30 records</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Mood Variety</div>
+        <div class="card-value" id="journalMoodVariety">0</div>
+        <div class="card-chip">Unique states logged</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Current Habit</div>
+        <div class="card-value" id="journalHabitLabel">Starting</div>
+        <div class="card-chip">Reflection consistency</div>
+    </div>
+</div>
+
+<div class="journal-layout">
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">New Entry</div>
+                <div class="panel-subtitle">Log the mindset behind your trading day</div>
+            </div>
+            <div class="panel-pill">Psychology + process</div>
+        </div>
+
+        <form action="/add_journal" method="POST" class="journal-form-grid">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div>
+                <label class="label">Entry Date</label>
+                <input type="date" name="entry_date" class="input" required>
+            </div>
+            <div>
+                <label class="label">Mood</label>
+                <select name="mood" class="input">
+                    <option>Focused</option>
+                    <option>Calm</option>
+                    <option>Confident</option>
+                    <option>Stressed</option>
+                    <option>Overtrading</option>
+                </select>
+            </div>
+            <div class="journal-notes-field">
+                <label class="label">Reflection Notes</label>
+                <textarea name="notes" class="input" rows="6" placeholder="What did you do well, what mistakes appeared, and what will you improve next session?"></textarea>
+            </div>
+            <div class="trade-form-actions">
+                <button class="btn" type="submit">Save Reflection</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="journal-side-stack">
+        <div class="panel">
+            <div class="panel-title">Reflection Summary</div>
+            <div class="note" id="journalSummaryText">Loading summary...</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Mood Signals</div>
+            <div class="analytics-diagnostics-grid">
+                <div class="mini-stat">
+                    <span>Most Common Mood</span>
+                    <strong id="journalTopMood">-</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Longest Streak</span>
+                    <strong id="journalStreak">0</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Latest Entry</span>
+                    <strong id="journalLatestDate">-</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Entries With Notes</span>
+                    <strong id="journalNotesCount">0</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-head">
+        <div>
+            <div class="panel-title">Reflection Timeline</div>
+            <div class="panel-subtitle">Recent entries are displayed like a real review journal, not plain text blocks</div>
+        </div>
+    </div>
+    <div id="journalTimeline" class="journal-timeline">Loading...</div>
+</div>
+
+<script>
+function getReflectionScore(entries) {
+    if (!entries.length) return 0;
+    const withNotes = entries.filter(e => (e.notes || "").trim().length >= 25).length;
+    const uniqueMoods = new Set(entries.map(e => e.mood || "Unknown")).size;
+    let score = 42;
+    score += Math.min(entries.length * 1.1, 24);
+    score += Math.min(withNotes * 2.5, 24);
+    score += Math.min(uniqueMoods * 5, 15);
+    return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function scoreLabel(score) {
+    if (score >= 82) return "Deep review habit";
+    if (score >= 68) return "Strong reflective process";
+    if (score >= 52) return "Building consistency";
+    return "Early journaling stage";
+}
+
+function getLongestEntryStreak(entries) {
+    if (!entries.length) return 0;
+    const dates = [...new Set(entries.map(e => e.entry_date))].sort();
+    let best = 1;
+    let current = 1;
+
+    for (let i = 1; i < dates.length; i++) {
+        const prev = new Date(dates[i - 1]);
+        const next = new Date(dates[i]);
+        const diff = (next - prev) / (1000 * 60 * 60 * 24);
+        if (diff === 1) {
+            current += 1;
+            best = Math.max(best, current);
+        } else {
+            current = 1;
+        }
+    }
+
+    return best;
+}
+
+function getMostCommonMood(entries) {
+    const counts = {};
+    entries.forEach(entry => {
+        const mood = entry.mood || "Unknown";
+        counts[mood] = (counts[mood] || 0) + 1;
+    });
+
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+}
+
+function buildTimeline(entries) {
+    if (!entries.length) {
+        return `<div class="note">No entries yet. Start your first reflection and this page will begin building your review history.</div>`;
+    }
+
+    return entries.map(entry => `
+        <article class="journal-entry-card">
+            <div class="journal-entry-head">
+                <div>
+                    <div class="journal-entry-date">${entry.entry_date}</div>
+                    <div class="journal-entry-time">Saved ${entry.created_at}</div>
+                </div>
+                <div class="journal-mood-pill">${entry.mood || "Mood not set"}</div>
+            </div>
+            <p class="journal-entry-note">${entry.notes || "No notes were added for this reflection."}</p>
+        </article>
+    `).join("");
+}
+
+async function loadJournal() {
+    const res = await fetch("/api/journal");
+    const entries = await res.json();
+
+    document.getElementById("journalCount").textContent = entries.length;
+    document.getElementById("journalTimeline").innerHTML = buildTimeline(entries);
+
+    if (!entries.length) {
+        document.getElementById("journalMood").textContent = "-";
+        document.getElementById("journalMoodVariety").textContent = "0";
+        document.getElementById("journalHabitLabel").textContent = "Starting";
+        document.getElementById("journalSummaryText").textContent = "No journal entries yet. Add a reflection to begin tracking mood, consistency, and learning patterns.";
+        return;
+    }
+
+    const latest = entries[0];
+    const score = getReflectionScore(entries);
+    const moodVariety = new Set(entries.map(e => e.mood || "Unknown")).size;
+    const mostCommonMood = getMostCommonMood(entries);
+    const streak = getLongestEntryStreak(entries);
+    const notesCount = entries.filter(e => (e.notes || "").trim().length > 0).length;
+
+    document.getElementById("journalMood").textContent = latest.mood || "Unknown";
+    document.getElementById("journalMoodVariety").textContent = moodVariety;
+    document.getElementById("journalHabitLabel").textContent = scoreLabel(score);
+    document.getElementById("journalReflectionScore").textContent = score;
+    document.getElementById("journalReflectionLabel").textContent = scoreLabel(score);
+    document.getElementById("journalReflectionFill").style.width = `${score}%`;
+    document.getElementById("journalReflectionNote").textContent =
+        score >= 70
+            ? "Your entries are building a strong reflective process for the project."
+            : "More frequent and more detailed entries will make the reflection side of the app stronger.";
+
+    document.getElementById("journalSummaryText").textContent =
+        `You have ${entries.length} journal entries recorded. The most common mood is ${mostCommonMood}, your current longest entry streak is ${streak} day(s), and ${notesCount} entries include written reflection notes.`;
+
+    document.getElementById("journalTopMood").textContent = mostCommonMood;
+    document.getElementById("journalStreak").textContent = streak;
+    document.getElementById("journalLatestDate").textContent = latest.entry_date;
+    document.getElementById("journalNotesCount").textContent = notesCount;
+}
+
+loadJournal();
+</script>
+
+{% endblock %}

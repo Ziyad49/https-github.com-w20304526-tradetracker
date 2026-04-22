@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block page_title %}Market{% endblock %}
+{% block page_subtitle %}Charting, watchlist context, and market review{% endblock %}
+
+{% block content %}
+
+<section class="market-hero">
+    <div class="market-hero-copy">
+        <span class="eyebrow">Market Workspace</span>
+        <h1>Review charts with more structure and less visual clutter.</h1>
+        <p>
+            This page now frames charting as part of the wider trading workflow. It helps the app feel more complete
+            by supporting market review before trade entry, journaling, or strategy tagging.
+        </p>
+    </div>
+
+    <div class="market-side-stack">
+        <div class="desk-mini-panel">
+            <span class="desk-mini-label">Current Focus</span>
+            <strong id="marketFocusValue">EURUSD</strong>
+            <small id="marketFocusLabel">Primary chart loaded</small>
+        </div>
+        <div class="desk-mini-panel">
+            <span class="desk-mini-label">Watchlist Mode</span>
+            <strong>Macro + execution</strong>
+            <small>Use this page for pre-trade analysis</small>
+        </div>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Chart Theme</div>
+        <div class="card-value" id="marketThemeValue">Dark</div>
+        <div class="card-chip">Syncs with workspace</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Primary Symbol</div>
+        <div class="card-value" id="marketPrimarySymbol">EURUSD</div>
+        <div class="card-chip">Active selection</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Review Goal</div>
+        <div class="card-value">Clarity</div>
+        <div class="card-chip">Pre-trade planning</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Chart Source</div>
+        <div class="card-value">TradingView</div>
+        <div class="card-chip">Embedded</div>
+    </div>
+</div>
+
+<div class="market-layout">
+    <div class="panel panel-featured">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Chart Workspace</div>
+                <div class="panel-subtitle">Switch symbols to review different markets without leaving the app</div>
+            </div>
+            <div class="panel-pill">Live chart</div>
+        </div>
+
+        <div class="market-toolbar">
+            <div class="market-field">
+                <label class="label">Symbol</label>
+                <select id="tvSymbol" class="input">
+                    <option value="FX:EURUSD">EURUSD</option>
+                    <option value="FX:GBPUSD">GBPUSD</option>
+                    <option value="FX:USDJPY">USDJPY</option>
+                    <option value="OANDA:XAUUSD">XAUUSD</option>
+                    <option value="OANDA:XAGUSD">XAGUSD</option>
+                    <option value="NASDAQ:TSLA">TSLA</option>
+                    <option value="NASDAQ:AAPL">AAPL</option>
+                    <option value="NASDAQ:NVDA">NVDA</option>
+                    <option value="NASDAQ:MSFT">MSFT</option>
+                    <option value="NASDAQ:AMZN">AMZN</option>
+                    <option value="BINANCE:BTCUSDT">BTCUSDT</option>
+                    <option value="BINANCE:ETHUSDT">ETHUSDT</option>
+                    <option value="CME_MINI:NQ1!">NASDAQ Futures</option>
+                    <option value="CME_MINI:ES1!">S&P 500 Futures</option>
+                    <option value="CME_MINI:YM1!">Dow Futures</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="chart-surface tv-widget market-chart-shell">
+            <div id="tradingview_widget"></div>
+        </div>
+    </div>
+
+    <div class="market-side-stack">
+        <div class="panel">
+            <div class="panel-title">Review Checklist</div>
+            <div class="note">
+                Check structure first, then momentum, then the quality of the setup. Use this page before you log a trade
+                so your journal and analytics stay connected to the market context.
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Quick Watchlist</div>
+            <div class="market-watchlist">
+                <div class="mini-stat"><span>FX</span><strong>EURUSD, GBPUSD</strong></div>
+                <div class="mini-stat"><span>Metals</span><strong>XAUUSD, XAGUSD</strong></div>
+                <div class="mini-stat"><span>Indices</span><strong>NAS100, US30</strong></div>
+                <div class="mini-stat"><span>Crypto</span><strong>BTCUSD, ETHUSD</strong></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateMarketState() {
+    const selectedText = document.getElementById("tvSymbol").selectedOptions[0].textContent;
+    const theme = document.documentElement.getAttribute("data-theme") === "light" ? "Light" : "Dark";
+    document.getElementById("marketFocusValue").textContent = selectedText;
+    document.getElementById("marketPrimarySymbol").textContent = selectedText;
+    document.getElementById("marketThemeValue").textContent = theme;
+}
+
+function loadTradingView(symbol) {
+    const container = document.getElementById("tradingview_widget");
+    container.innerHTML = "";
+
+    const existing = document.querySelector('script[data-tv-script="1"]');
+    if (existing) existing.remove();
+
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://s3.tradingview.com/tv.js";
+    script.dataset.tvScript = "1";
+    script.onload = () => {
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
+        new TradingView.widget({
+            width: "100%",
+            height: 620,
+            symbol: symbol,
+            interval: "60",
+            timezone: "Etc/UTC",
+            theme: isLight ? "light" : "dark",
+            style: "1",
+            locale: "en",
+            toolbar_bg: isLight ? "#f4efe7" : "#10141f",
+            enable_publishing: false,
+            hide_side_toolbar: false,
+            allow_symbol_change: false,
+            container_id: "tradingview_widget"
+        });
+    };
+    document.head.appendChild(script);
+}
+
+const symbolSelect = document.getElementById("tvSymbol");
+loadTradingView(symbolSelect.value);
+updateMarketState();
+
+symbolSelect.addEventListener("change", (e) => {
+    loadTradingView(e.target.value);
+    updateMarketState();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block page_title %}News & Calendar{% endblock %}
+{% block page_subtitle %}Macro briefing for headlines, events, and daily focus{% endblock %}
+
+{% block content %}
+
+<section class="news-hero">
+    <div class="news-hero-copy">
+        <span class="eyebrow">Macro Briefing</span>
+        <h1>Review events and headlines before they shape your trading day.</h1>
+        <p>
+            This page is now positioned as a briefing hub instead of a static list. It helps connect macro awareness
+            to your execution, journaling, and risk planning inside the rest of the project.
+        </p>
+    </div>
+
+    <div class="news-side-stack">
+        <div class="desk-mini-panel">
+            <span class="desk-mini-label">Current Focus</span>
+            <strong>High impact events</strong>
+            <small>Use this page before market open</small>
+        </div>
+        <div class="desk-mini-panel">
+            <span class="desk-mini-label">Time Zone</span>
+            <strong>UTC</strong>
+            <small>Aligned to the calendar table below</small>
+        </div>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">High Impact</div>
+        <div class="card-value">Today</div>
+        <div class="card-chip">Macro focus</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Upcoming Events</div>
+        <div class="card-value">Live</div>
+        <div class="card-chip">Calendar view</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Market Pulse</div>
+        <div class="card-value">Updated</div>
+        <div class="card-chip">Headline scan</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Briefing Mode</div>
+        <div class="card-value">Active</div>
+        <div class="card-chip">Daily review</div>
+    </div>
+</div>
+
+<div class="news-layout">
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Economic Calendar</div>
+                <div class="panel-subtitle">Switch between calendar views to prepare for volatility windows</div>
+            </div>
+            <div class="panel-pill">Macro schedule</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="today">Today</button>
+            <button class="tab-btn" data-tab="tomorrow">Tomorrow</button>
+            <button class="tab-btn" data-tab="week">This Week</button>
+        </div>
+
+        <div class="tab-content active" id="tab-today">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time (UTC)</th>
+                            <th>Currency</th>
+                            <th>Event</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>08:30</td><td>USD</td><td>CPI (YoY)</td><td class="neg">High</td></tr>
+                        <tr><td>10:00</td><td>EUR</td><td>ECB Press Conference</td><td class="neg">High</td></tr>
+                        <tr><td>12:30</td><td>USD</td><td>Initial Jobless Claims</td><td class="pos">Medium</td></tr>
+                        <tr><td>14:00</td><td>GBP</td><td>BoE Rate Decision</td><td class="neg">High</td></tr>
+                        <tr><td>15:00</td><td>USD</td><td>Crude Oil Inventories</td><td class="pos">Medium</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-tomorrow">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time (UTC)</th>
+                            <th>Currency</th>
+                            <th>Event</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>07:00</td><td>GBP</td><td>GDP (QoQ)</td><td class="neg">High</td></tr>
+                        <tr><td>09:00</td><td>EUR</td><td>Industrial Production</td><td class="pos">Medium</td></tr>
+                        <tr><td>13:30</td><td>USD</td><td>PPI (MoM)</td><td class="pos">Medium</td></tr>
+                        <tr><td>15:30</td><td>CAD</td><td>BoC Speech</td><td class="pos">Medium</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-week">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Currency</th>
+                            <th>Event</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Mon</td><td>08:30</td><td>USD</td><td>Retail Sales</td><td class="pos">Medium</td></tr>
+                        <tr><td>Tue</td><td>09:00</td><td>EUR</td><td>ZEW Survey</td><td class="pos">Medium</td></tr>
+                        <tr><td>Wed</td><td>14:00</td><td>USD</td><td>FOMC Minutes</td><td class="neg">High</td></tr>
+                        <tr><td>Thu</td><td>07:00</td><td>GBP</td><td>GDP (MoM)</td><td class="neg">High</td></tr>
+                        <tr><td>Fri</td><td>13:30</td><td>USD</td><td>NFP</td><td class="neg">High</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="news-side-stack">
+        <div class="panel">
+            <div class="panel-title">Market Headlines</div>
+            <div class="news-list">
+                <div class="news-item">
+                    <div class="news-title">USD strengthens ahead of CPI release</div>
+                    <div class="small-muted">Macro • 2h ago</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Tech stocks lead NASDAQ rebound</div>
+                    <div class="small-muted">Equities • 4h ago</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Gold holds near key resistance</div>
+                    <div class="small-muted">Commodities • 5h ago</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Oil volatility spikes after inventory data</div>
+                    <div class="small-muted">Energy • 7h ago</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Briefing Notes</div>
+            <div class="note">
+                Focus on high-impact releases like CPI, NFP, central bank decisions, and employment data. This page
+                works best when used together with the chart workspace and journal for pre- and post-event review.
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Quick Links</div>
+            <div class="note">
+                Economic Calendar (Myfxbook)<br>
+                Forex Factory Calendar<br>
+                Investing.com News
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+    });
+});
+</script>
+
+{% endblock %}

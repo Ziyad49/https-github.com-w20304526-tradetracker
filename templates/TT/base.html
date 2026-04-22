@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeTracker</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='static.js') }}" defer></script>
+</head>
+
+<body class="app-body">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">TT</div>
+        <div class="brand-copy">
+          <div class="brand-name">TradeTracker</div>
+          <div class="brand-subtitle">Trader intelligence</div>
+        </div>
+      </div>
+
+      <div class="sidebar-panel">
+        <div class="sidebar-caption">Workspace</div>
+        <div class="sidebar-highlight">
+          <strong>{{ session.get("user_name", "Trader") }}</strong>
+          <span>Active performance journal</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="nav-link {% if request.path == '/dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav-link {% if request.path == '/trades' %}active{% endif %}" href="{{ url_for('trades') }}">Trades</a>
+        <a class="nav-link {% if request.path == '/analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">Analytics</a>
+        <a class="nav-link {% if request.path == '/market' %}active{% endif %}" href="{{ url_for('market') }}">Market</a>
+        <a class="nav-link {% if request.path == '/news' %}active{% endif %}" href="{{ url_for('news') }}">News</a>
+        <a class="nav-link {% if request.path == '/strategies' %}active{% endif %}" href="{{ url_for('strategies') }}">Strategies</a>
+        <a class="nav-link {% if request.path == '/journal' %}active{% endif %}" href="{{ url_for('journal') }}">Journal</a>
+        <a class="nav-link {% if request.path == '/calculator' %}active{% endif %}" href="{{ url_for('calculator') }}">Calculator</a>
+        <a class="nav-link {% if request.path == '/settings' %}active{% endif %}" href="{{ url_for('settings') }}">Settings</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-card">
+          <span class="sidebar-caption">Data Source</span>
+          <strong>Local SQLite Demo</strong>
+          <span>Fast to run, simple to present</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="page-title">{% block page_title %}{% endblock %}</div>
+          <div class="page-subtitle">{% block page_subtitle %}{% endblock %}</div>
+        </div>
+
+        <div class="topbar-actions">
+          <a class="nav-btn topbar-link" href="{{ url_for('logout') }}">Logout</a>
+          <button class="theme-toggle" type="button">Dark</button>
+
+          <div class="user-chip">
+            <div class="dot"></div>
+            <div>
+              <strong>{{ session.get("user_name", "Trader") }}</strong>
+              <span>Signed in</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+</body>
+</html>

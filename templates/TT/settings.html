@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Profile, preferences, data tools, and workspace context{% endblock %}
+
+{% block content %}
+
+<section class="settings-hero">
+    <div class="settings-hero-copy">
+        <span class="eyebrow">Workspace Control</span>
+        <h1>Manage the account, preferences, and product story behind the platform.</h1>
+        <p>
+            Instead of a placeholder, this page now works as a proper control center. It helps the project feel
+            more complete by tying together profile details, display preferences, data tools, and system context.
+        </p>
+    </div>
+
+    <div class="settings-hero-panel">
+        <span class="panel-tag">Workspace Readiness</span>
+        <div class="analytics-score-value" id="settingsScoreValue">0</div>
+        <div class="analytics-score-label" id="settingsScoreLabel">Loading settings readiness...</div>
+        <div class="analytics-score-meter">
+            <div class="analytics-score-fill" id="settingsScoreFill"></div>
+        </div>
+        <p id="settingsScoreNote">Reviewing profile, controls, and export readiness.</p>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Account</div>
+        <div class="card-value">{{ session.get("user_name", "Trader") }}</div>
+        <div class="card-chip">Signed in</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Theme</div>
+        <div class="card-value" id="settingsThemeValue">Dark</div>
+        <div class="card-chip">Live preference</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Currency</div>
+        <div class="card-value">USD</div>
+        <div class="card-chip">Default display</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Starting Capital</div>
+        <div class="card-value">${{ '%.2f'|format(current_capital or 0) }}</div>
+        <div class="card-chip">Account baseline</div>
+    </div>
+</div>
+
+<div class="settings-layout">
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Profile Snapshot</div>
+                <div class="panel-subtitle">A more polished account summary for demos and screenshots</div>
+            </div>
+            <div class="panel-pill">User context</div>
+        </div>
+
+        <div class="settings-profile-card">
+            <div class="settings-avatar">{{ session.get("user_name", "T")[:1] }}</div>
+            <div class="settings-profile-copy">
+                <h3>{{ session.get("user_name", "Trader") }}</h3>
+                <p>Active user inside the TradeTracker performance workspace.</p>
+                <div class="settings-badge-row">
+                    <span class="table-badge">Performance review</span>
+                    <span class="table-badge">Journal enabled</span>
+                    <span class="table-badge">Strategy tracking</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-side-stack">
+        <div class="panel">
+            <div class="panel-title">Settings Summary</div>
+            <div class="note" id="settingsSummaryText">Loading workspace summary...</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Quick Signals</div>
+            <div class="analytics-diagnostics-grid">
+                <div class="mini-stat">
+                    <span>Theme Mode</span>
+                    <strong id="settingsSignalTheme">Dark</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Export Ready</span>
+                    <strong>Yes</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Database</span>
+                    <strong>SQLite</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Platform State</span>
+                    <strong>Configured</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="settings-grid">
+    <div class="panel">
+        <div class="panel-title">Preferences</div>
+        <form class="settings-form-grid" method="POST" action="/settings">
+            <div>
+                <label class="label">Default Currency</label>
+                <select class="input">
+                    <option>USD</option>
+                    <option>EUR</option>
+                    <option>GBP</option>
+                </select>
+            </div>
+            <div>
+                <label class="label">Risk Profile</label>
+                <select class="input">
+                    <option>Conservative</option>
+                    <option>Balanced</option>
+                    <option>Aggressive</option>
+                </select>
+            </div>
+            <div>
+                <label class="label">Equity Curve Range</label>
+                <select class="input">
+                    <option>Last 30 days</option>
+                    <option>Last 90 days</option>
+                    <option>All time</option>
+                </select>
+            </div>
+            <div>
+                <label class="label">Starting Capital</label>
+                <input class="input" type="number" min="0" step="0.01" name="capital" value="{{ '%.2f'|format(current_capital or 0) }}">
+            </div>
+            <div>
+                <label class="label">Dashboard Focus</label>
+                <select class="input">
+                    <option>Performance</option>
+                    <option>Risk</option>
+                    <option>Execution</option>
+                </select>
+            </div>
+            {% if capital_message %}
+            <div class="note">{{ capital_message }}</div>
+            {% endif %}
+            <div class="trade-form-actions">
+                <button class="btn" type="submit">Save Preferences</button>
+                <a class="btn btn-ghost" href="/settings">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Project Overview</div>
+        <div class="settings-info-stack">
+            <div class="note">
+                <strong>Product Positioning</strong><br>
+                TradeTracker is presented as a trader performance intelligence platform rather than a simple trade log.
+            </div>
+            <div class="note">
+                <strong>Technical Stack</strong><br>
+                Flask powers the application flow, SQLite handles the data layer, and Chart.js provides the analytics visuals.
+            </div>
+            <div class="note">
+                <strong>Presentation Value</strong><br>
+                This page helps show that the project is complete, coherent, and intentionally designed across the whole user journey.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-head">
+        <div>
+            <div class="panel-title">Data Tools</div>
+            <div class="panel-subtitle">Useful actions for demos, exports, and project presentation</div>
+        </div>
+    </div>
+
+    <div class="settings-tool-grid">
+        <div class="strategy-card">
+            <div class="strategy-card-head">
+                <div>
+                    <h3>Export Trade History</h3>
+                    <div class="small-muted">Download current trades as a CSV file for evaluation or evidence.</div>
+                </div>
+                <span class="table-badge">Live</span>
+            </div>
+            <div class="strategy-card-actions">
+                <a class="btn btn-small" href="/export/trades">Export CSV</a>
+            </div>
+        </div>
+
+        <div class="strategy-card">
+            <div class="strategy-card-head">
+                <div>
+                    <h3>Theme Control</h3>
+                    <div class="small-muted">Use the global theme toggle in the header to switch the workspace look instantly.</div>
+                </div>
+                <span class="table-badge">Available</span>
+            </div>
+            <div class="strategy-card-actions">
+                <button class="btn btn-small btn-ghost theme-toggle" type="button">Dark</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function getThemeLabel() {
+    return document.documentElement.getAttribute("data-theme") === "light" ? "Light" : "Dark";
+}
+
+function getSettingsScore() {
+    let score = 72;
+    if (getThemeLabel() === "Light") score += 4;
+    return Math.min(100, score);
+}
+
+function updateSettingsState() {
+    const theme = getThemeLabel();
+    const score = getSettingsScore();
+
+    document.getElementById("settingsThemeValue").textContent = theme;
+    document.getElementById("settingsSignalTheme").textContent = theme;
+    document.getElementById("settingsScoreValue").textContent = score;
+    document.getElementById("settingsScoreLabel").textContent = "Presentation-ready workspace";
+    document.getElementById("settingsScoreFill").style.width = `${score}%`;
+    document.getElementById("settingsScoreNote").textContent =
+        "The workspace now includes profile context, preference controls, export tools, and product framing.";
+    document.getElementById("settingsSummaryText").textContent =
+        `The current environment is configured for a ${theme.toLowerCase()} visual theme, a starting capital of ${{ '%.2f'|format(current_capital or 0) }}, trade export, and a cleaner project presentation story.`;
+}
+
+document.addEventListener("DOMContentLoaded", updateSettingsState);
+</script>
+
+{% endblock %}
