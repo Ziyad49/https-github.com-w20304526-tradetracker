@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Status • {{ app_name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/static.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <section class="auth-panel auth-panel-form">
+        <a href="/" class="auth-back-link">← Back to Home</a>
+
+        <div class="auth-card">
+            <div class="auth-kicker">Account status</div>
+            <h1>{{ title }}</h1>
+            <p class="auth-intro">{{ message }}</p>
+
+            <div class="auth-bottom-row">
+                {% if status == "success" %}
+                <a href="/login" class="text-link">Continue to login</a>
+                {% else %}
+                <a href="/register" class="text-link">Go back to register</a>
+                {% endif %}
+            </div>
+
+            <button class="theme-toggle auth-theme-toggle" type="button">Dark</button>
+        </div>
+    </section>
+
+    <section class="auth-panel auth-panel-visual">
+        <div class="auth-visual-card">
+            <span class="eyebrow">Public-ready auth</span>
+            <h2>Verified accounts only.</h2>
+            <p>
+                The platform now requires confirmed email ownership before a password can be set and a session can begin.
+            </p>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login • {{ app_name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/static.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <section class="auth-panel auth-panel-form">
+        <a href="/" class="auth-back-link">← Back to Home</a>
+
+        <div class="auth-card">
+            <div class="auth-kicker">Welcome back</div>
+            <h1>Access your trading command center.</h1>
+            <p class="auth-intro">
+                Log in to review your performance, track discipline, and keep every trade connected to a larger strategy.
+            </p>
+
+            {% if error %}
+            <div class="auth-alert">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/login" class="auth-form-fields">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <label class="label">Email</label>
+                <input
+                    type="text"
+                    class="input"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+                <label class="label">Password</label>
+                <input
+                    type="password"
+                    class="input"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <button class="btn auth-submit" type="submit">Login to Dashboard</button>
+            </form>
+
+            <div class="auth-bottom-row">
+                <span class="small-muted">Need an account?</span>
+                <a href="/register" class="text-link">Create one here</a>
+            </div>
+
+            <button class="theme-toggle auth-theme-toggle" type="button">Dark</button>
+        </div>
+    </section>
+
+    <section class="auth-panel auth-panel-visual">
+        <div class="auth-visual-card">
+            <span class="eyebrow">Performance Snapshot</span>
+            <h2>See the habits behind every result.</h2>
+            <p>
+                A stronger project feels analytical, not decorative. This experience positions your app as a serious
+                trader intelligence platform rather than a simple trade entry form.
+            </p>
+
+            <div class="auth-metric-stack">
+                <div class="auth-metric">
+                    <span>Weekly Edge</span>
+                    <strong>+6.2%</strong>
+                </div>
+                <div class="auth-metric">
+                    <span>Best Strategy</span>
+                    <strong>Breakout</strong>
+                </div>
+                <div class="auth-metric">
+                    <span>Consistency</span>
+                    <strong>82 / 100</strong>
+                </div>
+            </div>
+
+            <img src="{{ url_for('static', filename='images/chart-grid.svg') }}" alt="Trading analytics preview">
+        </div>
+    </section>
+</body>
+</html>

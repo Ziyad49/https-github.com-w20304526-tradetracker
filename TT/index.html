@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block page_title %}Command Dashboard{% endblock %}
+{% block page_subtitle %}A sharper overview of performance, discipline, and trading momentum{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-hero">
+    <div class="dashboard-hero-copy">
+        <span class="eyebrow">Trader Performance Intelligence</span>
+        <h1>See your edge, your discipline, and your weak points in one glance.</h1>
+        <p>
+            This dashboard turns raw trade history into a cleaner product story: what is working, where risk is leaking,
+            and how consistent the trader is over time.
+        </p>
+    </div>
+
+    <div class="dashboard-hero-board">
+        <div class="hero-board-card">
+            <span class="hero-board-label">Live Focus</span>
+            <strong id="heroFocusValue">Stabilizing...</strong>
+            <small id="heroFocusCaption">Loading performance readout</small>
+        </div>
+        <div class="hero-board-card">
+            <span class="hero-board-label">Win/Loss Split</span>
+            <strong id="heroSplitValue">0 / 0</strong>
+            <small>Trade outcome balance</small>
+        </div>
+        <div class="hero-board-card">
+            <span class="hero-board-label">Project Feel</span>
+            <strong>Premium</strong>
+            <small>Presentation-ready dashboard shell</small>
+        </div>
+    </div>
+</section>
+
+<div class="cards dashboard-summary-grid">
+    <div class="card stat-card">
+        <div class="card-label">Account Equity</div>
+        <div class="card-value" id="equityValue">$0</div>
+        <div class="card-chip">Balance + realised PnL</div>
+    </div>
+
+    <div class="card stat-card">
+        <div class="card-label">Net Profit</div>
+        <div class="card-value" id="netProfitValue">$0</div>
+        <div class="card-chip">Performance outcome</div>
+    </div>
+
+    <div class="card stat-card">
+        <div class="card-label">Total Trades</div>
+        <div class="card-value" id="tradesValue">0</div>
+        <div class="card-chip">Execution history</div>
+    </div>
+
+    <div class="card stat-card stat-card-ring">
+        <div>
+            <div class="card-label">Win Rate</div>
+            <div class="card-value" id="winRateValue">0%</div>
+            <div class="card-chip">Consistency marker</div>
+        </div>
+        <div class="winrate-ring" id="winRateRing">0%</div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="panel panel-featured">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Equity Curve</div>
+                <div class="panel-subtitle">A cleaner view of account growth over time</div>
+            </div>
+            <div class="panel-pill">Live analytics</div>
+        </div>
+        <div class="chart-surface dashboard-chart">
+            <canvas id="equityChart" height="190"></canvas>
+        </div>
+    </div>
+
+    <div class="panel insights-panel">
+        <div class="panel-title">Performance Brief</div>
+        <div class="note insight-block" id="highlightsText">Loading summary...</div>
+
+        <div class="panel-title">Execution Diagnostics</div>
+        <div class="note insight-block" id="metricsText">Loading metrics...</div>
+
+        <div class="panel-title">Trader Signal</div>
+        <div class="note insight-block" id="signalText">Generating signal...</div>
+    </div>
+</div>
+
+<div class="dashboard-lower-grid">
+    <div class="panel">
+        <div class="panel-title">Edge Breakdown</div>
+        <div class="mini-stat-grid">
+            <div class="mini-stat">
+                <span>Profit Factor</span>
+                <strong id="profitFactorValue">0.00</strong>
+            </div>
+            <div class="mini-stat">
+                <span>Average Win</span>
+                <strong id="avgWinValue">$0</strong>
+            </div>
+            <div class="mini-stat">
+                <span>Average Loss</span>
+                <strong id="avgLossValue">$0</strong>
+            </div>
+            <div class="mini-stat">
+                <span>Max Drawdown</span>
+                <strong id="drawdownValue">$0</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Why This Dashboard Feels Stronger</div>
+        <div class="dashboard-story-list">
+            <div class="story-item">
+                <strong>It explains performance.</strong>
+                <span>Not just numbers, but what those numbers say about risk and discipline.</span>
+            </div>
+            <div class="story-item">
+                <strong>It looks intentional.</strong>
+                <span>The visual hierarchy is cleaner, more premium, and easier to present confidently.</span>
+            </div>
+            <div class="story-item">
+                <strong>It supports your final-year narrative.</strong>
+                <span>You can talk about analytics, UX design, and trader behavior in one flow.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function money(value, withSign = false) {
+    const num = Number(value || 0);
+    const abs = Math.abs(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (withSign) {
+        return `${num >= 0 ? "+" : "-"}$${abs}`;
+    }
+    return `${num < 0 ? "-" : ""}$${abs}`;
+}
+
+function getFocusSignal(summary) {
+    if (summary.trades === 0) {
+        return {
+            title: "Awaiting first trade",
+            caption: "Start logging trades to generate performance intelligence."
+        };
+    }
+
+    if (summary.win_rate >= 60 && summary.profit_factor >= 1.5) {
+        return {
+            title: "Strong trading edge",
+            caption: "High win rate is being supported by healthy profitability."
+        };
+    }
+
+    if (summary.win_rate < 45 && summary.net_profit < 0) {
+        return {
+            title: "Execution needs review",
+            caption: "Recent results suggest strategy quality or risk control should be revisited."
+        };
+    }
+
+    if (summary.max_drawdown > Math.abs(summary.net_profit) && summary.max_drawdown > 0) {
+        return {
+            title: "Risk is dominating",
+            caption: "Drawdown is too large relative to the returns being generated."
+        };
+    }
+
+    return {
+        title: "Building consistency",
+        caption: "Performance is forming, but the edge still needs stronger repeatability."
+    };
+}
+
+async function loadSummary() {
+    try {
+        const res = await fetch("/api/summary");
+        if (!res.ok) throw new Error("summary request failed");
+        const s = await res.json();
+
+        if (!s.trades) {
+            document.getElementById("equityValue").textContent = money(s.equity);
+            document.getElementById("netProfitValue").textContent = money(0, true);
+            document.getElementById("tradesValue").textContent = "0";
+            document.getElementById("winRateValue").textContent = "0%";
+            document.getElementById("winRateRing").textContent = "0%";
+            document.getElementById("heroFocusValue").textContent = "No trades yet";
+            document.getElementById("heroFocusCaption").textContent = "Start adding trades and the dashboard will build itself from your results.";
+            document.getElementById("heroSplitValue").textContent = "—";
+            document.getElementById("highlightsText").textContent =
+                `This dashboard starts with your current capital at ${money(s.starting_balance)} and no trade history yet. Add your first trade to unlock equity tracking, win rate, drawdown, and performance insights.`;
+            document.getElementById("metricsText").textContent =
+                "There are no generated trading stats yet because no trades have been logged.";
+            document.getElementById("signalText").textContent =
+                "Once you start logging trades, the system will calculate your key performance metrics automatically.";
+            document.getElementById("profitFactorValue").textContent = "0.00";
+            document.getElementById("avgWinValue").textContent = "$0.00";
+            document.getElementById("avgLossValue").textContent = "$0.00";
+            document.getElementById("drawdownValue").textContent = "$0.00";
+            return;
+        }
+
+        document.getElementById("equityValue").textContent = money(s.equity);
+        document.getElementById("netProfitValue").textContent = money(s.net_profit, true);
+        document.getElementById("netProfitValue").className = `card-value ${s.net_profit >= 0 ? "pos" : "neg"}`;
+        document.getElementById("tradesValue").textContent = s.trades;
+        document.getElementById("winRateValue").textContent = `${s.win_rate}%`;
+
+        const ring = document.getElementById("winRateRing");
+        ring.style.setProperty("--value", `${s.win_rate}`);
+        ring.textContent = `${s.win_rate}%`;
+
+        const focus = getFocusSignal(s);
+        document.getElementById("heroFocusValue").textContent = focus.title;
+        document.getElementById("heroFocusCaption").textContent = focus.caption;
+        document.getElementById("heroSplitValue").textContent = `${s.wins} / ${s.losses}`;
+
+        document.getElementById("highlightsText").textContent =
+            `Starting balance ${money(s.starting_balance)}. Current equity is ${money(s.equity)} across ${s.trades} total trades, with ${s.wins} wins and ${s.losses} losses recorded.`;
+
+        document.getElementById("metricsText").textContent =
+            `Profit factor is ${Number(s.profit_factor || 0).toFixed(2)}, average win is ${money(s.avg_win)}, average loss is ${money(s.avg_loss)}, and maximum drawdown currently sits at ${money(s.max_drawdown)}.`;
+
+        const signalMessage =
+            s.net_profit >= 0
+                ? `The account is profitable overall. The next step is improving repeatability and keeping drawdown contained as trade volume grows.`
+                : `The account is under pressure. This is a good moment to review strategy quality, tighten risk, and compare winning versus losing setups.`;
+        document.getElementById("signalText").textContent = signalMessage;
+
+        document.getElementById("profitFactorValue").textContent = Number(s.profit_factor || 0).toFixed(2);
+        document.getElementById("avgWinValue").textContent = money(s.avg_win);
+        document.getElementById("avgLossValue").textContent = money(s.avg_loss);
+        document.getElementById("drawdownValue").textContent = money(s.max_drawdown);
+    } catch (error) {
+        document.getElementById("highlightsText").textContent = "Unable to load dashboard summary right now.";
+        document.getElementById("metricsText").textContent = "Refresh the page or sign in again to retry the analytics request.";
+        document.getElementById("signalText").textContent = "Dashboard data is temporarily unavailable.";
+        console.error(error);
+    }
+}
+
+async function loadEquityChart() {
+    const chartHost = document.querySelector(".dashboard-chart");
+    try {
+        if (typeof Chart === "undefined") {
+            throw new Error("Chart.js is unavailable");
+        }
+
+        const res = await fetch("/api/equity");
+        if (!res.ok) throw new Error("equity request failed");
+        const data = await res.json();
+        const ctx = document.getElementById("equityChart");
+        const context = ctx.getContext("2d");
+        const gradient = context.createLinearGradient(0, 0, 0, 220);
+        gradient.addColorStop(0, "rgba(125, 211, 199, 0.40)");
+        gradient.addColorStop(0.65, "rgba(184, 196, 214, 0.14)");
+        gradient.addColorStop(1, "rgba(184, 196, 214, 0.03)");
+
+        if (!data.labels.length) {
+            chartHost.innerHTML = `<div class="note">No equity history yet. Add trades to generate the performance curve.</div>`;
+            return;
+        }
+
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "Equity",
+                    data: data.values,
+                    borderColor: "#7dd3c7",
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.38,
+                    pointRadius: 0,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: "rgba(9, 13, 24, 0.96)",
+                        borderColor: "rgba(255,255,255,0.12)",
+                        borderWidth: 1,
+                        titleColor: "#f7f1e4",
+                        bodyColor: "#d6d8e2",
+                        padding: 12,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "rgba(228, 230, 237, 0.56)", maxTicksLimit: 6 }
+                    },
+                    y: {
+                        grid: { color: "rgba(255,255,255,0.05)" },
+                        ticks: { color: "rgba(228, 230, 237, 0.56)" }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        chartHost.innerHTML = `<div class="note">Unable to load the equity chart right now.</div>`;
+        console.error(error);
+    }
+}
+
+loadSummary();
+loadEquityChart();
+</script>
+
+{% endblock %}

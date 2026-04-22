@@ -1,0 +1,46 @@
+<svg width="980" height="620" viewBox="0 0 980 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1220"/>
+      <stop offset="1" stop-color="#0D1B2A"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <rect width="980" height="620" rx="30" fill="url(#bg)"/>
+  <rect x="26" y="26" width="928" height="568" rx="24" fill="#0F1A2B" stroke="#1E2A44"/>
+
+  <rect x="60" y="70" width="320" height="140" rx="16" fill="#0E1A2F" stroke="#1E2A44"/>
+  <rect x="400" y="70" width="520" height="140" rx="16" fill="#0E1A2F" stroke="#1E2A44"/>
+  <rect x="60" y="230" width="860" height="320" rx="18" fill="#0E1A2F" stroke="#1E2A44"/>
+
+  <path d="M96 178 L150 146 L220 162 L300 122" stroke="url(#accent)" stroke-width="4" fill="none"/>
+  <path d="M430 178 L510 126 L610 148 L700 110 L860 150" stroke="#38BDF8" stroke-width="4" fill="none"/>
+
+  <path d="M96 470 L190 420 L280 446 L380 398 L500 430 L640 360 L830 420" stroke="url(#accent)" stroke-width="4" fill="none"/>
+
+  <circle cx="96" cy="178" r="6" fill="#22C55E"/>
+  <circle cx="150" cy="146" r="6" fill="#22C55E"/>
+  <circle cx="220" cy="162" r="6" fill="#22C55E"/>
+  <circle cx="300" cy="122" r="6" fill="#22C55E"/>
+
+  <circle cx="430" cy="178" r="6" fill="#38BDF8"/>
+  <circle cx="510" cy="126" r="6" fill="#38BDF8"/>
+  <circle cx="610" cy="148" r="6" fill="#38BDF8"/>
+  <circle cx="700" cy="110" r="6" fill="#38BDF8"/>
+  <circle cx="860" cy="150" r="6" fill="#38BDF8"/>
+
+  <circle cx="96" cy="470" r="6" fill="#22C55E"/>
+  <circle cx="190" cy="420" r="6" fill="#22C55E"/>
+  <circle cx="280" cy="446" r="6" fill="#22C55E"/>
+  <circle cx="380" cy="398" r="6" fill="#22C55E"/>
+  <circle cx="500" cy="430" r="6" fill="#22C55E"/>
+  <circle cx="640" cy="360" r="6" fill="#22C55E"/>
+  <circle cx="830" cy="420" r="6" fill="#22C55E"/>
+
+  <rect x="90" y="96" width="90" height="12" rx="6" fill="#1E2A44"/>
+  <rect x="90" y="120" width="140" height="12" rx="6" fill="#1E2A44"/>
+  <rect x="90" y="144" width="110" height="12" rx="6" fill="#1E2A44"/>
+</svg>

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block page_title %}Strategies{% endblock %}
+{% block page_subtitle %}Build a cleaner playbook of repeatable setups{% endblock %}
+
+{% block content %}
+
+<section class="strategy-hero">
+    <div class="strategy-hero-copy">
+        <span class="eyebrow">Trading Playbook</span>
+        <h1>Build a cleaner library of setups, edges, and repeatable ideas.</h1>
+        <p>
+            This page turns strategy management into something more presentation-ready. Instead of a plain list,
+            it now feels like a structured playbook where each strategy has a clearer role inside the overall app.
+        </p>
+    </div>
+
+    <div class="strategy-hero-panel">
+        <span class="panel-tag">Strategy Depth</span>
+        <div class="analytics-score-value" id="strategyScoreValue">0</div>
+        <div class="analytics-score-label" id="strategyScoreLabel">Loading strategy quality...</div>
+        <div class="analytics-score-meter">
+            <div class="analytics-score-fill" id="strategyScoreFill"></div>
+        </div>
+        <p id="strategyScoreNote">Reviewing your current strategy library.</p>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Total Strategies</div>
+        <div class="card-value" id="strategyCount">0</div>
+        <div class="card-chip">Playbook size</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Top Strategy</div>
+        <div class="card-value" id="topStrategy">-</div>
+        <div class="card-chip">Best performer</div>
+    </div>
+    <div class="card">
+        <div class="card-label">With Descriptions</div>
+        <div class="card-value" id="describedStrategies">0</div>
+        <div class="card-chip">Documented setups</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Playbook Quality</div>
+        <div class="card-value" id="strategyQualityLabel">Starting</div>
+        <div class="card-chip">Documentation depth</div>
+    </div>
+</div>
+
+<div class="strategy-layout">
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Add Or Edit Strategy</div>
+                <div class="panel-subtitle">Define a repeatable setup in a cleaner, more structured way</div>
+            </div>
+            <div class="panel-pill">Playbook builder</div>
+        </div>
+
+        <form id="strategyForm" method="POST" action="/add_strategy" class="strategy-form-grid">
+            <input type="hidden" name="strategy_id" id="strategy_id">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div>
+                <label class="label">Strategy Name</label>
+                <input class="input" name="name" placeholder="e.g. London breakout" required>
+            </div>
+
+            <div>
+                <label class="label">Short Description</label>
+                <input class="input" name="description" placeholder="Describe the core setup or entry logic">
+            </div>
+
+            <div class="trade-form-actions">
+                <button class="btn" id="strategySubmit" type="submit">Save Strategy</button>
+                <button class="btn btn-ghost" type="button" id="strategyCancel" style="display:none;">Cancel Edit</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="strategy-side-stack">
+        <div class="panel">
+            <div class="panel-title">Playbook Summary</div>
+            <div class="note" id="strategySummaryText">Loading strategy overview...</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Strategy Signals</div>
+            <div class="analytics-diagnostics-grid">
+                <div class="mini-stat">
+                    <span>Top Performer</span>
+                    <strong id="strategySignalTop">-</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Unassigned Trades</span>
+                    <strong id="strategySignalUnassigned">0</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Most Complete Setup</span>
+                    <strong id="strategySignalDocumented">-</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Needs Description</span>
+                    <strong id="strategySignalIncomplete">0</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-head">
+        <div>
+            <div class="panel-title">Strategy Library</div>
+            <div class="panel-subtitle">Your strategies are shown as structured cards, with performance context where available</div>
+        </div>
+    </div>
+
+    <div id="strategyCardGrid" class="strategy-card-grid">Loading strategies...</div>
+</div>
+
+<script>
+function scoreStrategies(strategies) {
+    if (!strategies.length) return 0;
+    const described = strategies.filter(s => (s.description || "").trim().length > 0).length;
+    let score = 35;
+    score += Math.min(strategies.length * 8, 30);
+    score += Math.min(described * 10, 35);
+    return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function scoreLabel(score) {
+    if (score >= 80) return "Well-documented playbook";
+    if (score >= 62) return "Strong setup library";
+    if (score >= 45) return "Developing structure";
+    return "Early playbook stage";
+}
+
+function buildStrategyCards(strategies, pnlMap) {
+    if (!strategies.length) {
+        return `<div class="note">No strategies yet. Add your first setup and begin building your trading playbook.</div>`;
+    }
+
+    return strategies.map(strategy => {
+        const profit = pnlMap.get(strategy.name);
+        const hasProfit = typeof profit === "number";
+        return `
+            <article class="strategy-card">
+                <div class="strategy-card-head">
+                    <div>
+                        <h3>${strategy.name}</h3>
+                        <div class="small-muted">${strategy.description || "No description added yet."}</div>
+                    </div>
+                    <div class="strategy-profit ${hasProfit ? (profit >= 0 ? "pos" : "neg") : ""}">
+                        ${hasProfit ? `${profit >= 0 ? "+" : "-"}$${Math.abs(profit).toFixed(2)}` : "No trade data"}
+                    </div>
+                </div>
+
+                <div class="strategy-card-meta">
+                    <span class="table-badge">${strategy.description ? "Documented" : "Needs notes"}</span>
+                    <span class="table-badge">${hasProfit ? "Has performance data" : "Awaiting usage"}</span>
+                </div>
+
+                <div class="table-action-row strategy-card-actions">
+                    <button class="btn btn-small btn-ghost" type="button" onclick='editStrategy(${JSON.stringify(strategy)})'>Edit</button>
+                    <form method="POST" action="/delete_strategy">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="strategy_id" value="${strategy.id}">
+                        <button class="btn btn-small btn-danger-soft" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+async function loadStrategies() {
+    const [strategyRes, pnlRes, tradesRes] = await Promise.all([
+        fetch("/api/strategies"),
+        fetch("/api/strategy_pnl"),
+        fetch("/api/trades?limit=500")
+    ]);
+
+    const strategies = await strategyRes.json();
+    const strategyPnl = await pnlRes.json();
+    const trades = await tradesRes.json();
+
+    const pnlMap = new Map();
+    strategyPnl.labels.forEach((label, index) => {
+        pnlMap.set(label, Number(strategyPnl.values[index] || 0));
+    });
+
+    const described = strategies.filter(s => (s.description || "").trim().length > 0).length;
+    const score = scoreStrategies(strategies);
+    const unassignedTrades = trades.filter(t => !t.strategy_name).length;
+
+    document.getElementById("strategyCount").textContent = strategies.length;
+    document.getElementById("describedStrategies").textContent = described;
+    document.getElementById("strategyQualityLabel").textContent = scoreLabel(score);
+    document.getElementById("strategyScoreValue").textContent = score;
+    document.getElementById("strategyScoreLabel").textContent = scoreLabel(score);
+    document.getElementById("strategyScoreFill").style.width = `${score}%`;
+    document.getElementById("strategyScoreNote").textContent =
+        score >= 70
+            ? "Your playbook is becoming clear and presentation-ready."
+            : "Adding more strategies and better descriptions will strengthen this section.";
+
+    const rankedStrategies = [...strategies].sort((a, b) => {
+        const aProfit = pnlMap.get(a.name) ?? -Infinity;
+        const bProfit = pnlMap.get(b.name) ?? -Infinity;
+        return bProfit - aProfit;
+    });
+
+    document.getElementById("topStrategy").textContent = rankedStrategies[0]?.name || "-";
+    document.getElementById("strategySignalTop").textContent = rankedStrategies[0]?.name || "-";
+    document.getElementById("strategySignalUnassigned").textContent = unassignedTrades;
+    document.getElementById("strategySignalDocumented").textContent =
+        strategies.find(s => (s.description || "").trim().length > 20)?.name || "-";
+    document.getElementById("strategySignalIncomplete").textContent = strategies.length - described;
+
+    document.getElementById("strategySummaryText").textContent =
+        strategies.length
+            ? `You currently have ${strategies.length} strategies saved. ${described} of them include written descriptions, and ${unassignedTrades} trades are still unassigned, which means there is room to improve strategy-level analysis.`
+            : "No strategies are saved yet. Start by defining your core setups so the rest of the analytics become more meaningful.";
+
+    document.getElementById("strategyCardGrid").innerHTML = buildStrategyCards(strategies, pnlMap);
+}
+
+function editStrategy(strategy) {
+    document.getElementById("strategy_id").value = strategy.id;
+    document.querySelector("input[name='name']").value = strategy.name;
+    document.querySelector("input[name='description']").value = strategy.description || "";
+
+    const form = document.getElementById("strategyForm");
+    form.action = "/update_strategy";
+    document.getElementById("strategySubmit").textContent = "Update Strategy";
+    document.getElementById("strategyCancel").style.display = "inline-flex";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("strategyCancel").addEventListener("click", () => {
+    const form = document.getElementById("strategyForm");
+    form.reset();
+    form.action = "/add_strategy";
+    document.getElementById("strategy_id").value = "";
+    document.getElementById("strategySubmit").textContent = "Save Strategy";
+    document.getElementById("strategyCancel").style.display = "none";
+});
+
+loadStrategies();
+</script>
+
+{% endblock %}

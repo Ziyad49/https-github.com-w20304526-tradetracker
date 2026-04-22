@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Features • TradeTracker</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/static.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="landing-body">
+  <nav class="landing-nav">
+    <div class="logo">TradeTracker</div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="#feature-list">Features</a>
+      <a href="/login" class="nav-btn">Login</a>
+      <a href="/register" class="nav-btn primary">Register</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">Full product tour</div>
+      <h1>Everything you need to trade with discipline.</h1>
+      <p>
+        Log trades, analyze performance, and build a repeatable edge
+        with tools designed for professional workflows.
+      </p>
+      <div class="hero-buttons">
+        <a href="/register" class="primary-btn">Start Free</a>
+        <a href="/login" class="secondary-btn">Login</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <img src="{{ url_for('static', filename='images/chart-abstract.svg') }}" class="hero-image" alt="TradeTracker preview">
+    </div>
+  </section>
+
+  <section class="showcase">
+    <div class="showcase-card">
+      <img src="{{ url_for('static', filename='images/chart-grid.svg') }}" alt="Performance chart">
+      <div class="showcase-label">Performance Trends</div>
+    </div>
+    <div class="showcase-card">
+      <img src="{{ url_for('static', filename='images/chart-abstract.svg') }}" alt="Equity curve">
+      <div class="showcase-label">Equity Curve</div>
+    </div>
+    <div class="showcase-card">
+      <img src="{{ url_for('static', filename='images/chart-grid.svg') }}" alt="Risk analytics">
+      <div class="showcase-label">Risk Analytics</div>
+    </div>
+  </section>
+
+  <section class="features" id="feature-list">
+    <div class="feature-card">
+      <h3>Trade Journal</h3>
+      <p>Capture every trade with context, tags, and notes in seconds.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Advanced Analytics</h3>
+      <p>Equity curves, win rates, profit factor, and drawdown insights.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Strategy Tracking</h3>
+      <p>Tag trades to measure which setups produce the best results.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Risk Tools</h3>
+      <p>Position sizing calculators built for forex, indices, and crypto.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Performance Filters</h3>
+      <p>Filter by symbol, risk level, timeframe, or outcome.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Daily Journal</h3>
+      <p>Track mood, discipline, and consistency to improve long-term.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Clean UI</h3>
+      <p>Minimal, focused layout built to reduce noise and distractions.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Fast Setup</h3>
+      <p>Sign up and log your first trade in under two minutes.</p>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to upgrade your trading process?</h2>
+    <a href="/register" class="primary-btn big-btn">Get Started</a>
+  </section>
+
+  <footer class="landing-footer">
+    © 2026 TradeTracker • Built for traders
+  </footer>
+</body>
+</html>

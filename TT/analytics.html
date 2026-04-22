@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+
+{% block page_title %}Analytics{% endblock %}
+{% block page_subtitle %}Trader score, performance signals, and cleaner charts{% endblock %}
+
+{% block content %}
+
+<section class="analytics-hero">
+    <div class="analytics-hero-copy">
+        <span class="eyebrow">Performance Intelligence</span>
+        <h1>Turn raw trade history into insight, story, and decision support.</h1>
+        <p>
+            This is the wow page: a stronger dashboard for performance review, trader scoring, best and worst areas,
+            and clearer analytics that help explain what the numbers actually mean.
+        </p>
+    </div>
+
+    <div class="analytics-score-card">
+        <span class="panel-tag">Trader Score</span>
+        <div class="analytics-score-value" id="analyticsScoreValue">0</div>
+        <div class="analytics-score-label" id="analyticsScoreLabel">Calculating...</div>
+        <div class="analytics-score-meter">
+            <div class="analytics-score-fill" id="analyticsScoreFill"></div>
+        </div>
+        <p id="analyticsScoreNote">Loading score diagnostics...</p>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Net Profit</div>
+        <div class="card-value" id="anNetProfit">$0</div>
+        <div class="card-chip">Performance output</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Win Rate</div>
+        <div class="card-value" id="anWinRate">0%</div>
+        <div class="card-chip">Consistency</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Trades</div>
+        <div class="card-value" id="anTrades">0</div>
+        <div class="card-chip">Data depth</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Equity</div>
+        <div class="card-value" id="anEquity">$0</div>
+        <div class="card-chip">Current level</div>
+    </div>
+</div>
+
+<div class="analytics-grid">
+    <div class="panel panel-featured">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Monthly Profit Trend</div>
+                <div class="panel-subtitle">Performance momentum across time</div>
+            </div>
+            <div class="panel-pill">Story chart</div>
+        </div>
+        <div class="chart-surface analytics-chart-tall">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+
+    <div class="panel analytics-insight-stack">
+        <div class="panel-title">Executive Summary</div>
+        <div class="note" id="summaryText">Loading...</div>
+
+        <div class="panel-title">Smart Insights</div>
+        <div class="note" id="insightsText">Loading...</div>
+
+        <div class="panel-title">Performance Signals</div>
+        <div class="analytics-signal-list">
+            <div class="mini-stat">
+                <span>Best Symbol</span>
+                <strong id="bestSymbolValue">-</strong>
+            </div>
+            <div class="mini-stat">
+                <span>Weakest Symbol</span>
+                <strong id="weakestSymbolValue">-</strong>
+            </div>
+            <div class="mini-stat">
+                <span>Best Strategy</span>
+                <strong id="bestStrategyValue">-</strong>
+            </div>
+            <div class="mini-stat">
+                <span>Longest Win Streak</span>
+                <strong id="winStreakValue">0</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="analytics-grid lower-analytics-grid">
+    <div class="panel">
+        <div class="panel-title">Profit by Symbol</div>
+        <div class="chart-surface">
+            <canvas id="symbolChart" height="180"></canvas>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Profit by Strategy</div>
+        <div class="chart-surface">
+            <canvas id="strategyChart" height="180"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-title">Execution Diagnostics</div>
+    <div class="analytics-diagnostics-grid">
+        <div class="mini-stat">
+            <span>Profit Factor</span>
+            <strong id="profitFactorMetric">0.00</strong>
+        </div>
+        <div class="mini-stat">
+            <span>Average Win</span>
+            <strong id="avgWinMetric">$0</strong>
+        </div>
+        <div class="mini-stat">
+            <span>Average Loss</span>
+            <strong id="avgLossMetric">$0</strong>
+        </div>
+        <div class="mini-stat">
+            <span>Max Drawdown</span>
+            <strong id="drawdownMetric">$0</strong>
+        </div>
+        <div class="mini-stat">
+            <span>BUY Trade Average</span>
+            <strong id="buyAverageMetric">$0</strong>
+        </div>
+        <div class="mini-stat">
+            <span>SELL Trade Average</span>
+            <strong id="sellAverageMetric">$0</strong>
+        </div>
+    </div>
+</div>
+
+<script>
+function money(value, withSign = false) {
+    const num = Number(value || 0);
+    const abs = Math.abs(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (withSign) return `${num >= 0 ? "+" : "-"}$${abs}`;
+    return `${num < 0 ? "-" : ""}$${abs}`;
+}
+
+function scoreTrader(summary, trades) {
+    if (!trades.length) return 0;
+    let score = 40;
+    score += Math.min(summary.win_rate * 0.28, 20);
+    score += summary.net_profit > 0 ? 15 : 0;
+    score += Math.min(summary.profit_factor * 7, 18);
+    score += Math.min(trades.length * 0.3, 12);
+    score -= summary.max_drawdown > 1000 ? 10 : 0;
+    return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function scoreLabel(score) {
+    if (score >= 86) return "Elite discipline";
+    if (score >= 74) return "Structured trader";
+    if (score >= 60) return "Promising edge";
+    if (score >= 45) return "Developing process";
+    return "Needs tighter execution";
+}
+
+function aggregateMonthlyPnL(trades) {
+    const map = new Map();
+    trades.forEach(trade => {
+        const key = trade.created_at.slice(0, 7);
+        map.set(key, (map.get(key) || 0) + Number(trade.profit || 0));
+    });
+    const labels = [...map.keys()].sort();
+    return {
+        labels,
+        values: labels.map(label => Number(map.get(label).toFixed(2)))
+    };
+}
+
+function averageByType(trades, type) {
+    const filtered = trades.filter(t => t.trade_type === type);
+    if (!filtered.length) return 0;
+    return filtered.reduce((sum, t) => sum + Number(t.profit || 0), 0) / filtered.length;
+}
+
+function getStreaks(trades) {
+    let bestWin = 0;
+    let currentWin = 0;
+    let bestLoss = 0;
+    let currentLoss = 0;
+
+    [...trades].reverse().forEach(t => {
+        const profit = Number(t.profit || 0);
+        if (profit > 0) {
+            currentWin += 1;
+            currentLoss = 0;
+            bestWin = Math.max(bestWin, currentWin);
+        } else if (profit < 0) {
+            currentLoss += 1;
+            currentWin = 0;
+            bestLoss = Math.max(bestLoss, currentLoss);
+        }
+    });
+
+    return { bestWin, bestLoss };
+}
+
+function pickBestAndWorst(labels, values) {
+    if (!labels.length) return { best: "-", worst: "-" };
+    const paired = labels.map((label, i) => ({ label, value: Number(values[i] || 0) }));
+    const best = [...paired].sort((a, b) => b.value - a.value)[0];
+    const worst = [...paired].sort((a, b) => a.value - b.value)[0];
+    return { best: best.label, worst: worst.label };
+}
+
+function insightText(summary, trades, bestSymbol, weakestSymbol, bestStrategy, buyAvg, sellAvg) {
+    if (!trades.length) {
+        return "Log a few trades first and this page will begin surfacing performance patterns automatically.";
+    }
+
+    const lines = [];
+    lines.push(`Your strongest symbol is ${bestSymbol}, while ${weakestSymbol} is the weakest contributor right now.`);
+    lines.push(`The highest-performing strategy is ${bestStrategy}.`);
+
+    if (buyAvg > sellAvg) {
+        lines.push(`BUY trades are outperforming SELL trades by ${money(buyAvg - sellAvg)} on average.`);
+    } else if (sellAvg > buyAvg) {
+        lines.push(`SELL trades are outperforming BUY trades by ${money(sellAvg - buyAvg)} on average.`);
+    }
+
+    if (summary.max_drawdown > Math.abs(summary.net_profit) && summary.max_drawdown > 0) {
+        lines.push("Drawdown is still heavy relative to profits, so risk control is the next improvement area.");
+    } else if (summary.net_profit > 0) {
+        lines.push("The account is profitable overall, which gives you a strong story for your demo and evaluation.");
+    }
+
+    return lines.join(" ");
+}
+
+function buildBarChart(canvasId, labels, values, colorA, colorB) {
+    if (!labels.length) {
+        const host = document.getElementById(canvasId).closest(".chart-surface");
+        host.innerHTML = `<div class="note">No data yet. Add trades to populate this chart.</div>`;
+        return;
+    }
+
+    const ctx = document.getElementById(canvasId);
+    const gradient = ctx.getContext("2d").createLinearGradient(0, 0, 0, 180);
+    gradient.addColorStop(0, colorA);
+    gradient.addColorStop(1, colorB);
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                borderRadius: 10,
+                backgroundColor: gradient,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: "rgba(12, 18, 32, 0.95)",
+                    borderColor: "rgba(255,255,255,0.12)",
+                    borderWidth: 1,
+                    titleColor: "#e6edf7",
+                    bodyColor: "#cbd5f5",
+                    padding: 12
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: "rgba(214,216,226,0.7)" }
+                },
+                y: {
+                    grid: { color: "rgba(255,255,255,0.06)" },
+                    ticks: { color: "rgba(214,216,226,0.7)" }
+                }
+            }
+        }
+    });
+}
+
+function buildMonthlyChart(labels, values) {
+    if (!labels.length) {
+        const host = document.getElementById("monthlyChart").closest(".chart-surface");
+        host.innerHTML = `<div class="note">No monthly trend yet. Add trades to build the chart.</div>`;
+        return;
+    }
+
+    const ctx = document.getElementById("monthlyChart");
+    const gradient = ctx.getContext("2d").createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, "rgba(125, 211, 199, 0.42)");
+    gradient.addColorStop(1, "rgba(125, 211, 199, 0.05)");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Monthly PnL",
+                data: values,
+                borderColor: "#7dd3c7",
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 4,
+                pointHoverRadius: 5,
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: "rgba(12, 18, 32, 0.95)",
+                    borderColor: "rgba(255,255,255,0.12)",
+                    borderWidth: 1,
+                    titleColor: "#e6edf7",
+                    bodyColor: "#cbd5f5",
+                    padding: 12
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: "rgba(214,216,226,0.7)" }
+                },
+                y: {
+                    grid: { color: "rgba(255,255,255,0.06)" },
+                    ticks: { color: "rgba(214,216,226,0.7)" }
+                }
+            }
+        }
+    });
+}
+
+async function loadAnalytics() {
+    const [summaryRes, symbolRes, strategyRes, tradesRes] = await Promise.all([
+        fetch("/api/summary"),
+        fetch("/api/symbol_pnl"),
+        fetch("/api/strategy_pnl"),
+        fetch("/api/trades?limit=500")
+    ]);
+
+    const s = await summaryRes.json();
+    const symbolData = await symbolRes.json();
+    const strategyData = await strategyRes.json();
+    const trades = await tradesRes.json();
+
+    document.getElementById("anNetProfit").textContent = s.trades ? money(s.net_profit, true) : "$0.00";
+    document.getElementById("anNetProfit").className = `card-value ${s.trades ? (s.net_profit >= 0 ? "pos" : "neg") : ""}`;
+    document.getElementById("anWinRate").textContent = s.trades ? `${s.win_rate}%` : "0%";
+    document.getElementById("anTrades").textContent = s.trades;
+    document.getElementById("anEquity").textContent = s.trades ? money(s.equity) : "$0.00";
+
+    const score = scoreTrader(s, trades);
+    document.getElementById("analyticsScoreValue").textContent = score;
+    document.getElementById("analyticsScoreLabel").textContent = trades.length ? scoreLabel(score) : "No trading data yet";
+    document.getElementById("analyticsScoreFill").style.width = `${score}%`;
+    document.getElementById("analyticsScoreNote").textContent =
+        trades.length
+            ? (score >= 70
+                ? "The current profile looks structured and presentation-ready."
+                : "There is still room to improve consistency, risk control, and edge.")
+            : "Add trades and this page will score performance, risk, and consistency automatically.";
+
+    const monthly = aggregateMonthlyPnL(trades);
+    buildMonthlyChart(monthly.labels, monthly.values);
+    buildBarChart("symbolChart", symbolData.labels, symbolData.values, "rgba(125, 211, 199, 0.72)", "rgba(125, 211, 199, 0.14)");
+    buildBarChart("strategyChart", strategyData.labels, strategyData.values, "rgba(184, 196, 214, 0.82)", "rgba(184, 196, 214, 0.16)");
+
+    const symbolPick = pickBestAndWorst(symbolData.labels, symbolData.values);
+    const strategyPick = pickBestAndWorst(strategyData.labels, strategyData.values);
+    const streaks = getStreaks(trades);
+    const buyAvg = averageByType(trades, "BUY");
+    const sellAvg = averageByType(trades, "SELL");
+
+    document.getElementById("bestSymbolValue").textContent = trades.length ? symbolPick.best : "-";
+    document.getElementById("weakestSymbolValue").textContent = trades.length ? symbolPick.worst : "-";
+    document.getElementById("bestStrategyValue").textContent = trades.length ? strategyPick.best : "-";
+    document.getElementById("winStreakValue").textContent = streaks.bestWin;
+
+    document.getElementById("summaryText").textContent =
+        trades.length
+            ? `Across ${s.trades} trades, the account is sitting at ${money(s.equity)} with ${money(s.net_profit, true)} net profit, a ${s.win_rate}% win rate, and ${money(s.max_drawdown)} maximum drawdown.`
+            : "This page starts empty for a new user. Once trades are logged, it will automatically calculate performance, streaks, and chart-based insights.";
+
+    document.getElementById("insightsText").textContent =
+        insightText(s, trades, symbolPick.best, symbolPick.worst, strategyPick.best, buyAvg, sellAvg);
+
+    document.getElementById("profitFactorMetric").textContent = trades.length ? s.profit_factor.toFixed(2) : "0.00";
+    document.getElementById("avgWinMetric").textContent = trades.length ? money(s.avg_win) : "$0.00";
+    document.getElementById("avgLossMetric").textContent = trades.length ? money(s.avg_loss) : "$0.00";
+    document.getElementById("drawdownMetric").textContent = trades.length ? money(s.max_drawdown) : "$0.00";
+    document.getElementById("buyAverageMetric").textContent = trades.length ? money(buyAvg, true) : "$0.00";
+    document.getElementById("sellAverageMetric").textContent = trades.length ? money(sellAvg, true) : "$0.00";
+}
+
+loadAnalytics();
+</script>
+{% endblock %}

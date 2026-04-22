@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block page_title %}Calculator{% endblock %}
+{% block page_subtitle %}Position size and risk planning for disciplined execution{% endblock %}
+
+{% block content %}
+
+<section class="calc-hero">
+    <div class="calc-hero-copy">
+        <span class="eyebrow">Risk Planning</span>
+        <h1>Size the trade before you take it.</h1>
+        <p>
+            This calculator now feels more like a proper risk tool inside the platform. It supports the wider project
+            story by connecting risk control to execution quality, consistency, and post-trade review.
+        </p>
+    </div>
+
+    <div class="calc-side-stack">
+        <div class="desk-mini-panel">
+            <span class="desk-mini-label">Risk Style</span>
+            <strong id="calcStyleValue">Conservative</strong>
+            <small id="calcStyleNote">1% risk keeps downside controlled</small>
+        </div>
+        <div class="desk-mini-panel">
+            <span class="desk-mini-label">Suggested Lot</span>
+            <strong id="calcLotHero">0.00</strong>
+            <small>Updates after calculation</small>
+        </div>
+    </div>
+</section>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Account Balance</div>
+        <div class="card-value" id="calcBalance">$25,000</div>
+        <div class="card-chip">Default</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Risk Per Trade</div>
+        <div class="card-value" id="calcRisk">1%</div>
+        <div class="card-chip">Conservative</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Stop Loss</div>
+        <div class="card-value" id="calcSL">20</div>
+        <div class="card-chip">Points / pips</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Suggested Lot</div>
+        <div class="card-value" id="calcLot">0.00</div>
+        <div class="card-chip">Calculated</div>
+    </div>
+</div>
+
+<div class="calc-layout">
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <div class="panel-title">Risk Calculator</div>
+                <div class="panel-subtitle">Use this before every trade to protect consistency</div>
+            </div>
+            <div class="panel-pill">Position sizing</div>
+        </div>
+
+        <div class="calc-form-grid">
+            <div>
+                <label class="label">Instrument</label>
+                <select id="pair" class="input">
+                    <optgroup label="Forex">
+                        <option value="EURUSD">EURUSD</option>
+                        <option value="GBPUSD">GBPUSD</option>
+                        <option value="USDJPY">USDJPY</option>
+                        <option value="GBPJPY">GBPJPY</option>
+                        <option value="AUDUSD">AUDUSD</option>
+                        <option value="USDCAD">USDCAD</option>
+                        <option value="NZDUSD">NZDUSD</option>
+                        <option value="USDCHF">USDCHF</option>
+                    </optgroup>
+                    <optgroup label="Metals">
+                        <option value="XAUUSD">XAUUSD (Gold)</option>
+                        <option value="XAGUSD">XAGUSD (Silver)</option>
+                    </optgroup>
+                    <optgroup label="Indices">
+                        <option value="NAS100">NAS100 (Nasdaq)</option>
+                        <option value="SPX500">SPX500 (S&P 500)</option>
+                        <option value="US30">US30 (Dow Jones)</option>
+                        <option value="GER40">GER40 (DAX)</option>
+                        <option value="UK100">UK100 (FTSE 100)</option>
+                        <option value="JP225">JP225 (Nikkei)</option>
+                    </optgroup>
+                    <optgroup label="Crypto">
+                        <option value="BTCUSD">BTCUSD</option>
+                        <option value="ETHUSD">ETHUSD</option>
+                    </optgroup>
+                    <optgroup label="Stocks">
+                        <option value="AAPL">AAPL</option>
+                        <option value="TSLA">TSLA</option>
+                        <option value="NVDA">NVDA</option>
+                        <option value="MSFT">MSFT</option>
+                        <option value="AMZN">AMZN</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div>
+                <label class="label">Account Balance ($)</label>
+                <input id="balance" class="input" type="number" placeholder="25000">
+            </div>
+
+            <div>
+                <label class="label">Risk %</label>
+                <input id="risk" class="input" type="number" placeholder="1">
+            </div>
+
+            <div>
+                <label class="label">Stop Loss (pips / points)</label>
+                <input id="sl" class="input" type="number" placeholder="20">
+            </div>
+
+            <div class="trade-form-actions">
+                <button class="btn" type="button" onclick="calc()">Calculate Position Size</button>
+            </div>
+        </div>
+
+        <div class="note" id="result">Result: --</div>
+    </div>
+
+    <div class="calc-side-stack">
+        <div class="panel">
+            <div class="panel-title">Risk Checklist</div>
+            <div class="note">
+                Keep risk per trade small, define the stop loss before entry, and avoid adjusting size emotionally
+                after a win or loss streak. Consistency is part of the project story and the trading logic.
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Quick Guidance</div>
+            <div class="analytics-diagnostics-grid">
+                <div class="mini-stat">
+                    <span>1% Risk</span>
+                    <strong>Conservative</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>2% Risk</span>
+                    <strong>Balanced</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Reward Goal</span>
+                    <strong>1:2 minimum</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Best Practice</span>
+                    <strong>No moving stops</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function calc() {
+    const pipValues = {
+        "EURUSD": 10,
+        "GBPUSD": 10,
+        "AUDUSD": 10,
+        "USDCAD": 10,
+        "USDJPY": 9,
+        "GBPJPY": 7,
+        "NZDUSD": 10,
+        "USDCHF": 10,
+        "XAUUSD": 10,
+        "XAGUSD": 5,
+        "NAS100": 1,
+        "SPX500": 1,
+        "US30": 1,
+        "GER40": 1,
+        "UK100": 1,
+        "JP225": 1,
+        "BTCUSD": 1,
+        "ETHUSD": 1,
+        "AAPL": 1,
+        "TSLA": 1,
+        "NVDA": 1,
+        "MSFT": 1,
+        "AMZN": 1
+    };
+
+    const pair = document.getElementById("pair").value;
+    const balance = parseFloat(document.getElementById("balance").value || 0);
+    const risk = parseFloat(document.getElementById("risk").value || 0);
+    const sl = parseFloat(document.getElementById("sl").value || 0);
+
+    if (!balance || !risk || !sl) {
+        document.getElementById("result").innerText = "Result: please fill all fields";
+        return;
+    }
+
+    const riskMoney = balance * (risk / 100);
+    const pipValue = pipValues[pair];
+    const lotSize = (riskMoney / (sl * pipValue)).toFixed(2);
+
+    document.getElementById("result").innerText =
+        `Instrument: ${pair} | Risk money: $${riskMoney.toFixed(2)} | Pip/Point value: $${pipValue} | Suggested lot size: ${lotSize}`;
+
+    document.getElementById("calcBalance").textContent = `$${balance.toLocaleString()}`;
+    document.getElementById("calcRisk").textContent = `${risk}%`;
+    document.getElementById("calcSL").textContent = `${sl}`;
+    document.getElementById("calcLot").textContent = `${lotSize}`;
+    document.getElementById("calcLotHero").textContent = `${lotSize}`;
+
+    if (risk <= 1) {
+        document.getElementById("calcStyleValue").textContent = "Conservative";
+        document.getElementById("calcStyleNote").textContent = "Disciplined sizing protects the account.";
+    } else if (risk <= 2) {
+        document.getElementById("calcStyleValue").textContent = "Balanced";
+        document.getElementById("calcStyleNote").textContent = "Moderate risk with room for controlled growth.";
+    } else {
+        document.getElementById("calcStyleValue").textContent = "Aggressive";
+        document.getElementById("calcStyleNote").textContent = "Higher risk means drawdown control matters more.";
+    }
+}
+</script>
+
+{% endblock %}

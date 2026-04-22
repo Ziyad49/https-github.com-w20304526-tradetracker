@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register • {{ app_name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/static.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <section class="auth-panel auth-panel-form">
+        <a href="/" class="auth-back-link">← Back to Home</a>
+
+        <div class="auth-card">
+            <div class="auth-kicker">Create your account</div>
+            <h1>Start building your trading edge.</h1>
+            <p class="auth-intro">
+                Register with your name and email. We will send a confirmation link so you can set your password securely.
+            </p>
+
+            {% if error %}
+            <div class="auth-alert">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" class="auth-form-fields">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <label class="label">First Name</label>
+                <input class="input" name="first_name" placeholder="Enter your first name" required>
+
+                <label class="label">Last Name</label>
+                <input class="input" name="last_name" placeholder="Enter your last name" required>
+
+                <label class="label">Email</label>
+                <input type="email" class="input" name="email" placeholder="Enter your email" required>
+
+                <button class="btn auth-submit" type="submit">Send Confirmation Email</button>
+            </form>
+
+            <div class="auth-bottom-row">
+                <span class="small-muted">Already registered?</span>
+                <a href="/login" class="text-link">Go to login</a>
+            </div>
+
+            <button class="theme-toggle auth-theme-toggle" type="button">Dark</button>
+        </div>
+    </section>
+
+    <section class="auth-panel auth-panel-visual">
+        <div class="auth-visual-card">
+            <span class="eyebrow">What You Unlock</span>
+            <h2>A project that feels polished the moment it opens.</h2>
+            <p>
+                {{ app_name }} combines trade journaling, strategy reviews, performance analytics, and presentation-ready
+                design into one cleaner product story.
+            </p>
+
+            <div class="auth-bullet-grid">
+                <div class="auth-bullet">Track trades with notes and screenshots</div>
+                <div class="auth-bullet">Measure win rate, drawdown, and profit factor</div>
+                <div class="auth-bullet">Compare strategies and execution discipline</div>
+                <div class="auth-bullet">Present a stronger final-year portfolio piece</div>
+            </div>
+
+            <img src="{{ url_for('static', filename='images/chart-abstract.svg') }}" alt="Trade journaling preview">
+        </div>
+    </section>
+</body>
+</html>

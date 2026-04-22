@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeTracker • Performance Intelligence for Traders</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/static.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="landing-body">
+    <nav class="landing-nav">
+        <a href="/" class="landing-brand">
+            <span class="landing-brand-mark">TT</span>
+            <span>
+                <strong>TradeTracker</strong>
+                <small>Performance Intelligence</small>
+            </span>
+        </a>
+
+        <div class="landing-nav-links">
+            <a href="#mission">Why It Matters</a>
+            <a href="#platform">Platform</a>
+            <a href="#impact">Impact</a>
+            <button class="theme-toggle" type="button">Dark</button>
+            <a href="/login" class="nav-btn">Login</a>
+            <a href="/register" class="nav-btn primary">Start Now</a>
+        </div>
+    </nav>
+
+    <main class="landing-shell">
+        <section class="hero">
+            <div class="hero-copy">
+                <h1>Turn a trade journal into a performance story people remember.</h1>
+                <p class="hero-text">
+                    TradeTracker helps traders log positions, review mistakes, analyze strategy performance,
+                    and surface the kind of insights that make the project feel smarter than a basic CRUD app.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="/register" class="primary-btn">Create Account</a>
+                    <a href="/login" class="secondary-btn">Open Demo Flow</a>
+                </div>
+
+                <div class="hero-stat-strip">
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">+18.4%</span>
+                        <span class="hero-stat-label">Equity acceleration</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">74%</span>
+                        <span class="hero-stat-label">Discipline score</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">12</span>
+                        <span class="hero-stat-label">Insight surfaces</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-terminal-card">
+                    <div class="terminal-head">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="signal-grid">
+                        <div class="signal-card signal-card-large">
+                            <div class="signal-label">Equity Momentum</div>
+                            <div class="signal-value">$31,480</div>
+                            <div class="signal-chart signal-chart-rise"></div>
+                        </div>
+                        <div class="signal-card">
+                            <div class="signal-label">Best Symbol</div>
+                            <div class="signal-value">XAUUSD</div>
+                            <div class="signal-caption">High conviction, controlled drawdown</div>
+                        </div>
+                        <div class="signal-card">
+                            <div class="signal-label">Weekly Focus</div>
+                            <div class="signal-value">Risk Control</div>
+                            <div class="signal-caption">2 oversized losses detected</div>
+                        </div>
+                        <div class="signal-card signal-card-wide">
+                            <div class="signal-label">Smart Insight</div>
+                            <p>
+                                Your medium-risk trades outperform high-risk positions by a wide margin.
+                                The platform highlights this instantly so the trader can adjust behavior, not just record data.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="platform-grid" id="mission">
+            <article class="platform-card">
+                <span class="eyebrow">Journal with context</span>
+                <h3>Capture more than entry and exit.</h3>
+                <p>Store notes, strategy tags, screenshots, and decision quality so every trade contributes to learning.</p>
+            </article>
+            <article class="platform-card">
+                <span class="eyebrow">Analytics with narrative</span>
+                <h3>Show what the numbers mean.</h3>
+                <p>Use win rate, drawdown, profit factor, and consistency metrics to explain performance, not just display it.</p>
+            </article>
+            <article class="platform-card">
+                <span class="eyebrow">Presentation-friendly</span>
+                <h3>Designed to feel like a real product.</h3>
+                <p>Premium visuals, structured hierarchy, and stronger visual storytelling make the project easier to present confidently.</p>
+            </article>
+        </section>
+
+        <section class="landing-showcase" id="platform">
+            <div class="section-heading">
+                <span class="eyebrow">Platform Snapshot</span>
+                <h2>Built like a trader performance cockpit.</h2>
+                <p>
+                    A strong final-year project should feel deliberate. This layout gives you a clearer product identity:
+                    part journal, part analytics engine, part decision-support tool.
+                </p>
+            </div>
+
+            <div class="showcase-grid">
+                <div class="showcase-panel">
+                    <div class="showcase-copy">
+                        <span class="panel-tag">Dashboard</span>
+                        <h3>Executive-level overview at a glance</h3>
+                        <p>See equity, edge, consistency, and risk signals in one place before drilling into detailed analytics.</p>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/chart-grid.svg') }}" alt="Analytics dashboard preview">
+                </div>
+                <div class="showcase-panel">
+                    <div class="showcase-copy">
+                        <span class="panel-tag">Journal</span>
+                        <h3>Trade decisions become reviewable evidence</h3>
+                        <p>Each journal note supports reflection, future recommendations, and stronger project storytelling.</p>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/chart-abstract.svg') }}" alt="Trade journal preview">
+                </div>
+            </div>
+        </section>
+
+        <section class="impact-band" id="impact">
+            <div class="impact-intro">
+                <span class="eyebrow">Why This Feels Stronger</span>
+                <h2>Markers remember projects that feel complete.</h2>
+            </div>
+            <div class="impact-metrics">
+                <div class="impact-metric">
+                    <strong>Premium UI</strong>
+                    <span>Not just functional pages, but a recognisable product identity.</span>
+                </div>
+                <div class="impact-metric">
+                    <strong>Insight-driven</strong>
+                    <span>Push the app beyond storage by surfacing patterns and performance signals.</span>
+                </div>
+                <div class="impact-metric">
+                    <strong>Presentation-ready</strong>
+                    <span>Gives you stronger screenshots, demos, and talking points for the final submission.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta" id="cta">
+            <span class="eyebrow">Start Building The Wow Factor</span>
+            <h2>Log in, explore the dashboard, and turn the project into something memorable.</h2>
+            <div class="hero-actions">
+                <a href="/register" class="primary-btn">Create Your Account</a>
+                <a href="/login" class="secondary-btn">Go To Login</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="landing-footer">
+        <span>TradeTracker</span>
+        <span>Trader journal • analytics • strategy intelligence</span>
+    </footer>
+</body>
+</html>
