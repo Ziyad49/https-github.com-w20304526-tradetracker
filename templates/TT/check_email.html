@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Email • {{ app_name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/static.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <section class="auth-panel auth-panel-form">
+        <a href="/" class="auth-back-link">← Back to Home</a>
+
+        <div class="auth-card">
+            <div class="auth-kicker">One more step</div>
+            <h1>Check your email.</h1>
+            <p class="auth-intro">
+                We sent a confirmation link to <strong>{{ email }}</strong>. Open it to confirm your account and set your password.
+            </p>
+
+            <div class="auth-alert auth-alert-soft">
+                {% if delivery_mode == "smtp" %}
+                Your confirmation message has been sent. The link expires in 24 hours.
+                {% else %}
+                Email delivery is in local preview mode right now. The verification link was printed in the Flask terminal for testing.
+                {% endif %}
+            </div>
+
+            <div class="auth-bottom-row">
+                <span class="small-muted">Already confirmed?</span>
+                <a href="/login" class="text-link">Go to login</a>
+            </div>
+
+            <button class="theme-toggle auth-theme-toggle" type="button">Dark</button>
+        </div>
+    </section>
+
+    <section class="auth-panel auth-panel-visual">
+        <div class="auth-visual-card">
+            <span class="eyebrow">Secure Onboarding</span>
+            <h2>Verification first, password second.</h2>
+            <p>
+                This flow is safer for a public-facing launch because accounts are only activated after the email address is confirmed.
+            </p>
+        </div>
+    </section>
+</body>
+</html>
